@@ -1,19 +1,16 @@
-package com.jjh.TNonBlockingServer;
+package com.jjh.THsHaServer;
 
 import com.jjh.thrift.demo.HelloWorldService;
 import com.jjh.thrift.demo.impl.HelloWorldImpl;
 import org.apache.thrift.TProcessor;
-import org.apache.thrift.protocol.TCompactProtocol;
-import org.apache.thrift.server.TNonblockingServer;
-import org.apache.thrift.server.TServer;
+import org.apache.thrift.protocol.TBinaryProtocol;
+import org.apache.thrift.server.THsHaServer;
 import org.apache.thrift.transport.TFramedTransport;
 import org.apache.thrift.transport.TNonblockingServerSocket;
-import org.apache.thrift.transport.TServerSocket;
-import org.apache.thrift.transport.TTransportFactory;
 
 /**
- * Created by jiajianhong on 16/9/5.
- * 使用非阻塞式IO
+ * Created by jiajianhong on 16/9/6.
+ * 半同步半异步的服务端模型
  */
 public class HelloServerDemo {
 
@@ -21,29 +18,27 @@ public class HelloServerDemo {
 
     public void startServer() {
         try {
-            System.out.println("TNonBlocking Server start ...");
+
+            System.out.println("HelloWorld THsHaServer start...");
 
             TProcessor processor = new HelloWorldService.Processor<HelloWorldService.Iface>(new HelloWorldImpl());
 
             // 打开端口
-            TNonblockingServerSocket serverSocket = new TNonblockingServerSocket(SERVER_PORT);
+            TNonblockingServerSocket socket = new TNonblockingServerSocket(SERVER_PORT);
 
             // 封装参数
-            TNonblockingServer.Args args = new TNonblockingServer.Args(serverSocket);
-
+            THsHaServer.Args args = new THsHaServer.Args(socket);
             args.processor(processor);
-
-            // 设定特定的传输模式
             args.transportFactory(new TFramedTransport.Factory());
-            args.protocolFactory(new TCompactProtocol.Factory());
+            args.protocolFactory(new TBinaryProtocol.Factory());
 
-            // 使用非阻塞式IO,服务端和客户端需要指定TframedTransport数据传输方式
-            TServer server = new TNonblockingServer(args);
+            // 半同步半异步的服务模型
+            THsHaServer server = new THsHaServer(args);
             server.serve();
-
         } catch (Exception e) {
-            System.out.println("Server start error!!!");
+            System.out.println("THsHaServer start error!!!");
             e.printStackTrace();
+
         }
     }
 
