@@ -51,7 +51,4 @@ public class HelloClientDemo {
         clientDemo.startClient();
     }
 
-    public void test() {
-
-    }
 }
